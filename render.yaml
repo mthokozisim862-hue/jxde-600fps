@@ -8,6 +8,4 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0
-    buildpacks:
-      - url: https://github.com/render-examples/ffmpeg-buildpack.git
-      - url: render/python
+      
