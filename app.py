@@ -14,7 +14,8 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("../templates_index.html")
+
 
 @app.route("/process", methods=["POST"])
 def process():
