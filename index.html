@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JXDE UPLOAD METHOD // 4K 240FPS</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --accent-color: #ffffff;
+            --accent-dim: #888888;
+            --border-color: #222222;
+            --panel-bg: #111111;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--accent-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            color: var(--accent-color);
+        }
+
+        header p {
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            color: var(--accent-dim);
+            text-transform: uppercase;
+        }
+
+        .upload-panel {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px 20px;
+            margin-bottom: 24px;
+            transition: border-color 0.3s ease;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 40px 20px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .upload-area:active {
+            transform: scale(0.98);
+            border-color: var(--accent-color);
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            color: var(--accent-color);
+        }
+
+        .upload-subtext {
+            font-size: 0.75rem;
+            color: var(--accent-dim);
+            margin-top: 6px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent-dim);
+            margin-top: 15px;
+        }
+
+        .status-badge span {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* Paywall Modal Design */
+        .paywall-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            padding: 20px;
+        }
+
+        .paywall-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .paywall-card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px 24px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+
+        .paywall-overlay.active .paywall-card {
+            transform: translateY(0);
+        }
+
+        .paywall-card h2 {
+            font-size: 1.5rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .paywall-card p {
+            font-size: 0.9rem;
+            color: var(--accent-dim);
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+
+        .price-tag {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            color: var(--accent-color);
+        }
+
+        .price-tag span {
+            font-size: 1rem;
+            color: var(--accent-dim);
+            font-weight: 400;
+        }
+
+        .checkout-btn {
+            display: block;
+            width: 100%;
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .checkout-btn:active {
+            transform: scale(0.95);
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            color: var(--accent-dim);
+            text-transform: uppercase;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>JXDE</h1>
+            <p>Bypass Ingestion • 4K • 240 FPS</p>
+        </header>
+
+        <div class="upload-panel">
+            <div class="upload-area" onclick="handleUploadTrigger()">
+                <div class="upload-icon">⚡</div>
+                <div class="upload-text" id="action-text">Select Mobile Video</div>
+                <div class="upload-subtext">HEVC .mp4 output optimization</div>
+                <input type="file" id="video-input" accept="video/*" onchange="processVideoUpload(this)">
+            </div>
+            <div class="status-badge" id="usage-badge">Free Uses Remaining: <span id="uses-count">5</span></div>
+        </div>
+
+        <footer>
+            To maintain structural fidelity:<br>
+            Upload via Mobile Browser in Desktop View Mode.
+        </footer>
+    </div>
+
+    <!-- Paywall Modal Screen -->
+    <div class="paywall-overlay" id="paywall">
+        <div class="paywall-card">
+            <h2>Trial Expired</h2>
+            <p>You have exhausted your 5 free optimization passes. Unlock unlimited high-fidelity 4K renders.</p>
+            <div class="price-tag">$5.00<span> / month</span></div>
+            <!-- PASTE YOUR STRIPE PAYMENT LINK IN HREF BELOW -->
+            <a href="https://stripe.com" class="checkout-btn">Unlock Premium</a>
+        </div>
+    </div>
+
+    <script>
+        // Link to your live active Render backend server URL
+        const BACKEND_API_URL = "https://onrender.com";
+        const MAX_FREE_USES = 5;
+
+        let usageData = JSON.parse(localStorage.getItem('jxde_config')) || { uses: 0, premium: false };
+
+        function updateUI() {
+            const remaining = MAX_FREE_USES - usageData.uses;
+            if (usageData.premium) {
+                document.getElementById('usage-badge').innerHTML = "Account Status: <span>PREMIUM</span>";
+            } else {
+                document.getElementById('uses-count').innerText = remaining > 0 ? remaining : 0;
+            }
+        }
+
+        function handleUploadTrigger() {
+            if (!usageData.premium && usageData.uses >= MAX_FREE_USES) {
+                document.getElementById('paywall').classList.add('active');
+                return;
+            }
+            document.getElementById('video-input').click();
+        }
+
+        function processVideoUpload(input) {
+            if (input.files.length === 0) return;
+            
+            const file = input.files[0];
+            const actionText = document.getElementById('action-text');
+            actionText.innerText = "Processing File...";
+
+            const formData = new FormData();
+            formData.append('video', file);
+
+            fetch(BACKEND_API_URL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.status === 402) {
+                    document.getElementById('paywall').classList.add('active');
+                    throw new Error('Paywall active');
+                }
+                if (!response.ok) throw new Error('Server processing failed');
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Jxde_4K_240FPS_${Date.now()}.mp4`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+
+                if (!usageData.premium) {
+                    usageData.uses += 1;
+                    localStorage.setItem('jxde_config', JSON.stringify(usageData));
+                }
+                
+                actionText.innerText = "Optimization Complete";
+                updateUI();
+                setTimeout(() => { actionText.innerText = "Select Mobile Video"; }, 4000);
+            })
+            .catch(err => {
+                console.error(err);
+                if(err.message !== 'Paywall active') {
+                    actionText.innerText = "Processing Failed";
+                    setTimeout(() => { actionText.innerText = "Select Mobile Video"; }, 3000);
+                }
+            });
+        }
+
+        updateUI();
+    </script>
+</body>
